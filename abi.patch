@@ -1,0 +1,50 @@
+diff --git a/src/vmware.c b/src/vmware.c
+index 2d1eabd..879c206 100644
+--- a/src/vmware.c
++++ b/src/vmware.c
+@@ -18,7 +18,9 @@ char rcsId_vmware[] =
+ 
+ #include "xf86.h"
+ #include "xf86_OSproc.h"
++#if GET_ABI_MAJOR(ABI_VIDEODRV_VERSION) < 6
+ #include "xf86Resources.h"
++#endif
+ 
+ #include "compiler.h"	/* inb/outb */
+ 
+@@ -109,11 +111,15 @@ static SymTabRec VMWAREChipsets[] = {
+     { -1,                  NULL }
+ };
+ 
++#ifndef XSERVER_LIBPCIACCESS
+ static resRange vmwareLegacyRes[] = {
+     { ResExcIoBlock, SVGA_LEGACY_BASE_PORT,
+       SVGA_LEGACY_BASE_PORT + SVGA_NUM_PORTS*sizeof(uint32)},
+     _VGA_EXCLUSIVE, _END
+ };
++#else
++#define vmwareLegacyRes NULL
++#endif
+ 
+ #if XSERVER_LIBPCIACCESS
+ 
+diff --git a/src/vmware.h b/src/vmware.h
+index a3502dd..31560b5 100644
+--- a/src/vmware.h
++++ b/src/vmware.h
+@@ -19,12 +19,14 @@
+ 
+ #include "xf86.h"
+ #include "xf86_OSproc.h"
+-#include "xf86Resources.h"
++
+ 
+ #include <X11/extensions/panoramiXproto.h>
+ 
+ #ifdef XSERVER_LIBPCIACCESS
+ #include <pciaccess.h>
++#else
++#include "xf86Resources.h"
+ #endif
+ 
+ #include "compiler.h"	        /* inb/outb */
